@@ -28,9 +28,10 @@
 #define DNG_RES_H
 
 #include <filesystem>
-
-const std::filesystem::path DEFAULT_PROC{"dnglib/defaults.lua"};
-const std::filesystem::path DEFAULT_FONT{"res/PressStart2P-vaV7.ttf"};
+#include <libloaderapi.h>
+#define MAX_BUF_SIZE 1024
+const std::filesystem::path DEFAULT_PROC{R"(dnglib\defaults.lua)"};
+const std::filesystem::path DEFAULT_FONT{R"(res\PressStart2P-vaV7.ttf)"};
 // TODO setup to allow switching to monospace instead of game font
 // const std::filesystem::path DEFAULT_MONOSPACE_FONT{
 //    "res/LiberationMono-Regular.ttf"};
@@ -42,16 +43,24 @@ struct Res {
 
 } typedef Res;
 
-inline const char* to_str(std::filesystem::path file) {
-  return file.c_str();
+inline const char *to_str(const std::filesystem::path &file) {
+  std::setlocale(LC_ALL, "en_US.utf8"); // TODO more support?
+  const wchar_t *wstr = file.c_str();
+  size_t len = std::wcslen(wstr) + 1; // gotta get that \0
+  char *ret = static_cast<char *>(malloc(sizeof(char) * len)); // buffered
+  std::wcstombs(ret, file.c_str(), len);
+  return ret;
 }
 
 inline Res get_resources() {
   using namespace std::filesystem;
 
   auto current_dir = current_path();
-  auto exe_dir = canonical("/proc/self/exe").remove_filename();
-  auto install_dir = path{"/usr/local/share/dng/"};
+  char exe_dir_str[255];
+  GetModuleFileNameA(nullptr, exe_dir_str, 255);
+  auto exe_dir = path(exe_dir_str).remove_filename();
+  // TODO - Get from PATH or Reg?
+  auto install_dir = path{R"(C:\Program\ Files\ (x86)\dng)"};
 
   Res res;
   if (exists(current_dir / DEFAULT_PROC)) {
@@ -77,5 +86,10 @@ inline Res get_resources() {
 
   return res;
 }
+
+#endif // DNG_RES_H
+
+#ifndef DNG_RES_H
+#define DNG_RES_H
 
 #endif // DNG_RES_H
