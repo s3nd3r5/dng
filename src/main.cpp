@@ -32,6 +32,9 @@
 #ifdef __linux__
 #include "linux/res.h"
 #endif
+#ifdef _WIN32
+#include "windows/res.h"
+#endif
 #include "lua.hpp"
 #include <SFML/Graphics.hpp>
 #include <cmath>
@@ -55,14 +58,13 @@ int main(int argc, char **argv) {
 
   std::string lvl_pfx = argv[1];
 
-  std::filesystem::path mapFile{lvl_pfx + "/dng.map"};
-  std::filesystem::path luaFile{lvl_pfx + "/proc.lua"};
+  std::filesystem::path mapFile = lvl_pfx / std::filesystem::path{"dng.map"};
+  std::filesystem::path luaFile = lvl_pfx / std::filesystem::path{"proc.lua"};
 
   lvl = std::make_shared<Level>();
   scene = Scene::INTRO;
 
-  lvl->loadLevelFromFile(mapFile.c_str());
-
+  lvl->loadLevelFromFile(to_str(mapFile));
   lua_State *L_lvl = luaL_newstate();
   luaL_openlibs(L_lvl);
   init_c_api(L_lvl);
@@ -72,7 +74,7 @@ int main(int argc, char **argv) {
   init_c_api(L_default);
 
   if (std::filesystem::exists(res.defaultsFile) &&
-      luaL_dofile(L_default, res.defaultsFile.c_str()) != LUA_OK) {
+      luaL_dofile(L_default, to_str(res.defaultsFile)) != LUA_OK) {
     std::cout << "Failed to load default proc" << std::endl;
     luaL_error(L_default, "Error: %s", lua_tostring(L_default, -1));
     return EXIT_FAILURE;
@@ -82,7 +84,7 @@ int main(int argc, char **argv) {
   LState *l_state = init_default(L_default);
 
   if (std::filesystem::exists(luaFile) &&
-      luaL_dofile(L_lvl, luaFile.c_str()) == LUA_OK) {
+      luaL_dofile(L_lvl, to_str(luaFile)) == LUA_OK) {
     override_file_fns(L_lvl, l_state);
   } else if (std::filesystem::exists(luaFile)) {
     std::cout << "[C] No Good" << std::endl;
@@ -124,7 +126,7 @@ int main(int argc, char **argv) {
   window.setView(view);
   sf::Clock deltaClock;
   sf::Font font;
-  font.loadFromFile(res.fontFile);
+  font.loadFromFile(to_str(res.fontFile));
 
   MessageBox intro;
   MessageBox win;

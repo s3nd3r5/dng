@@ -31,6 +31,7 @@
 #include "SFML/Graphics/Text.hpp"
 #include "SfmlUtils.h"
 #include <vector>
+#include <limits>
 
 const int LARGE_TEXT = 54;
 const int MEDIUM_TEXT = 36;
@@ -57,7 +58,7 @@ inline MessageBox initializeMessageBox(const std::vector<DisplayText> &strs,
   sf::RectangleShape box;
   float width = 0.f;
   float height = 0.f;
-  float left = MAXFLOAT;
+  float left = std::numeric_limits<float>::max();
   sf::Text prev;
   for (const auto &str : strs) {
     sf::Text text = write_text(str.msg.c_str(), str.textSize, LINE_HEIGHT, font,
