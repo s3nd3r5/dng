@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.16)
 project(dng
         VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 20)
+if (WIN32)
+    set(CMAKE_CXX_FLAGS -static)
+endif()
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-${PROJECT_VERSION})
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON)
 
@@ -79,6 +82,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${SFML_LIBRARIES} ${LUA_LIBRARIES})
 if (UNIX)
     set(SFML_INSTALL_PKGCONFIG_FILES FALSE)
 endif ()
+
 install(TARGETS ${PROJECT_NAME} DESTINATION .)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res DESTINATION .)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/maps DESTINATION .)
@@ -88,10 +92,11 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/thirdparty-licenses.txt DES
 
 
 # Package Directives
-set(CPACK_GEN TGZ)
 if (WIN32)
     set(CPACK_GEN ZIP)
-endif ()
+else()
+    set(CPACK_GEN TGZ)
+endif()
 
 set(CPACK_GENERATOR ${CPACK_GEN})
 set(CPACK_SOURCE_GENERATOR ${CPACK_GEN})
