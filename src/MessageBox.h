@@ -30,8 +30,8 @@
 #include "SFML/Graphics/RectangleShape.hpp"
 #include "SFML/Graphics/Text.hpp"
 #include "SfmlUtils.h"
-#include <vector>
 #include <limits>
+#include <vector>
 
 const int LARGE_TEXT = 54;
 const int MEDIUM_TEXT = 36;
@@ -42,13 +42,12 @@ struct MessageBox {
 
   std::vector<sf::Text> msgs;
   sf::RectangleShape box;
-
-} typedef MessageBox;
+};
 
 struct DisplayText {
   std::string msg;
   int textSize;
-} typedef DisplayText;
+};
 
 inline MessageBox initializeMessageBox(const std::vector<DisplayText> &strs,
                                        const sf::Font &font,

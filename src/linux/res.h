@@ -39,12 +39,9 @@ struct Res {
 
   std::filesystem::path defaultsFile;
   std::filesystem::path fontFile;
+};
 
-} typedef Res;
-
-inline const char* to_str(std::filesystem::path file) {
-  return file.c_str();
-}
+inline const char *to_str(std::filesystem::path file) { return file.c_str(); }
 
 inline Res get_resources() {
   using namespace std::filesystem;
@@ -77,5 +74,7 @@ inline Res get_resources() {
 
   return res;
 }
+
+inline Res discover_levels() {}
 
 #endif // DNG_RES_H
