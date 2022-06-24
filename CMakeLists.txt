@@ -4,7 +4,7 @@ project(dng
 set(CMAKE_CXX_STANDARD 20)
 if (WIN32)
     set(CMAKE_CXX_FLAGS -static)
-endif()
+endif ()
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-${PROJECT_VERSION})
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON)
 
@@ -46,9 +46,9 @@ add_library(lualib STATIC
         ${LUA_SRC}/lstrlib.c
         ${LUA_SRC}/ltablib.c
         ${LUA_SRC}/lutf8lib.c)
-if(UNIX)
+if (UNIX)
     target_compile_definitions(lualib PRIVATE -DLUA_USE_POSIX=1) # to properly use mkstemp
-endif()
+endif ()
 target_include_directories(lua PUBLIC lua)
 target_include_directories(lauxlib PUBLIC lua)
 target_include_directories(lualib PUBLIC lua)
@@ -58,10 +58,10 @@ include_directories(${PROJECT_SOURCE_DIR}/thirdparty/lua)
 
 # System specific includes
 if (UNIX)
-    set(RES_LIB src/linux/res.h)
-elseif(WIN32)
-    set(RES_LIB src/windows/res.h)
-endif()
+    set(RES_LIB src/resources/Resources.cpp src/resources/Resources.h src/resources/linux/LinuxResources.cpp src/resources/linux/LinuxResources.h)
+elseif (WIN32)
+    set(RES_LIB src/resources/Resources.cpp src/resources/Resources.h src/resources/windows/WindowsResources.cpp src/resources/windows/WindowsResources.h)
+endif ()
 
 add_executable(${PROJECT_NAME} src/main.cpp src/Level.cpp src/Level.h src/CApi.h src/Scene.h src/LuaApi.h src/MessageBox.h ${RES_LIB})
 target_link_libraries(${PROJECT_NAME} PUBLIC ${LUA_LIBRARIES})
@@ -70,6 +70,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${LUA_LIBRARIES})
 set(BUILD_SHARED_LIBS FALSE)
 set(SFML_LIBRARIES sfml-system sfml-window sfml-graphics)
 if (WIN32)
+    set(SFML_STATIC TRUE)
     set(SFML_USE_STATIC_STD_LIBS TRUE)
 endif ()
 set(SFML_USE_SYSTEM_DEPS ON)
@@ -94,9 +95,9 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/thirdparty-licenses.txt DES
 # Package Directives
 if (WIN32)
     set(CPACK_GEN ZIP)
-else()
+else ()
     set(CPACK_GEN TGZ)
-endif()
+endif ()
 
 set(CPACK_GENERATOR ${CPACK_GEN})
 set(CPACK_SOURCE_GENERATOR ${CPACK_GEN})

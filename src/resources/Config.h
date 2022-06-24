@@ -24,54 +24,24 @@
 //
 //========================================================================
 
-#ifndef DNG_LEVEL_H
-#define DNG_LEVEL_H
+#ifndef DNG_CONFIG_H
+#define DNG_CONFIG_H
 
-#include "SFML/Graphics/RectangleShape.hpp"
-#include <memory>
+#include <filesystem>
 #include <vector>
 
-// tokens from map file
-static const char PLAYER_TKN = 'p';
-static const char WALL_TKN = 'w';
-static const char EMPTY_TKN = '0';
-static const char TREASURE_TKN = 't';
-static const char ENEMY_TKN = 'e';
-static const char BLANK_SPACE = '\0';
-static const char WALL_SPACE = '#';
-
-struct Pos {
-  int id;
-  int x;
-  int y;
-  sf::RectangleShape sprite;
+/**
+ * Simple config struct mapping to the default locations
+ * Map just include directly in Resources
+ */
+struct Config {
+  bool fixed_resolution;
+  // configured as WidthxHeight
+  unsigned int fixed_width;
+  unsigned int fixed_height;
+  std::filesystem::path defaultsDir;
+  std::vector<std::filesystem::path> fonts;
+  std::vector<std::filesystem::path> levels;
 };
 
-class Level {
-
-public:
-  explicit Level(const char *filePath);
-  ~Level() = default;
-  void load();
-  bool playerCanStep(int dx, int dy) const;
-  int getEnemyIndex(int id);
-  bool enemyCanStep(const Pos &pos, int dx, int dy) const;
-  void reset();
-  int nextId();
-  int getWidth() const;
-  int getHeight() const;
-
-  std::vector<std::vector<char>> map; // source copy of map
-  std::vector<sf::RectangleShape> displayMap;
-  Pos player;
-  std::vector<Pos> enemyPositions;
-  std::vector<Pos> treasurePositions;
-
-private:
-  int idCounter = 1; // defaults at 1 (player always 0)
-  int width{};
-  int height{};
-  std::unique_ptr<std::string> file;
-};
-
-#endif // DNG_LEVEL_H
+#endif // DNG_CONFIG_H
