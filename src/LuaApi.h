@@ -36,7 +36,7 @@ struct LState {
   lua_State *onintro;
   lua_State *onwin;
   lua_State *onloss;
-} typedef LState;
+};
 
 const char *ON_KEYPRESS = "onKeyPress";
 const char *ON_UPDATE = "onUpdate";

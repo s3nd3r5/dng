@@ -40,8 +40,7 @@ struct Res {
 
   std::filesystem::path defaultsFile;
   std::filesystem::path fontFile;
-
-} typedef Res;
+};
 
 inline const char *to_str(const std::filesystem::path &file) {
   std::setlocale(LC_ALL, "en_US.utf8"); // TODO more support?

@@ -45,7 +45,7 @@ struct Pos {
   int x;
   int y;
   sf::RectangleShape sprite;
-} typedef Pos;
+};
 
 class Level {
 
