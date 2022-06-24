@@ -29,13 +29,14 @@
 #include "LuaApi.h"
 #include "MessageBox.h"
 #include "SfmlUtils.h"
-#ifdef __linux__
-#include "linux/res.h"
-#endif
-#ifdef _WIN32
-#include "windows/res.h"
-#endif
 #include "lua.hpp"
+#include "resources/Resources.h"
+#ifdef __linux__
+#include "resources/linux/LinuxResources.h"
+#endif // __linux__
+#ifdef _WIN32
+#include "resources/windows/WindowsResources.h"
+#endif // _WIN32
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include <filesystem>
@@ -49,22 +50,31 @@ const int MAX_HEIGHT = static_cast<int>(SPRITE_SIZE) * 20 * 3;
 
 int main(int argc, char **argv) {
 
-  if (argc <= 1) {
-    std::cerr << "Must pass in path to level directory" << std::endl;
-    return -1;
+#ifdef __linux__
+  Resources *res = new LinuxResources();
+  res->loadDefaultLuaFile();
+  res->loadFontFiles();
+  res->loadLevels();
+#endif // __linux__
+#ifdef _WIN32
+  Resources *res = new WindowsResources();
+#endif
+
+  int levelIndex = 0;
+  std::cout << "Select level from list: " << std::endl;
+  int i = 0;
+  for (auto &p : res->getLevels()) {
+    std::cout << "\t[" << i++ << "] " << p.parent_path().filename().c_str()
+              << "/" << p.filename().c_str() << std::endl;
   }
+  std::cout << "Enter Number: ";
+  std::cin >> levelIndex;
 
-  auto res = get_resources();
-
-  std::string lvl_pfx = argv[1];
-
-  std::filesystem::path mapFile = lvl_pfx / std::filesystem::path{"dng.map"};
-  std::filesystem::path luaFile = lvl_pfx / std::filesystem::path{"proc.lua"};
-
-  lvl = std::make_shared<Level>();
+  lvl = std::make_shared<Level>(
+      res->convert_to_str(*res->getLevelMap(levelIndex)));
   scene = Scene::INTRO;
 
-  lvl->loadLevelFromFile(to_str(mapFile));
+  lvl->load();
   lua_State *L_lvl = luaL_newstate();
   luaL_openlibs(L_lvl);
   init_c_api(L_lvl);
@@ -73,8 +83,8 @@ int main(int argc, char **argv) {
   luaL_openlibs(L_default);
   init_c_api(L_default);
 
-  if (std::filesystem::exists(res.defaultsFile) &&
-      luaL_dofile(L_default, to_str(res.defaultsFile)) != LUA_OK) {
+  if (luaL_dofile(L_default, res->convert_to_str(*res->getDefaultsLuaFile())) !=
+      LUA_OK) {
     std::cout << "Failed to load default proc" << std::endl;
     luaL_error(L_default, "Error: %s", lua_tostring(L_default, -1));
     return EXIT_FAILURE;
@@ -83,10 +93,12 @@ int main(int argc, char **argv) {
   // Initialize to default
   LState *l_state = init_default(L_default);
 
-  if (std::filesystem::exists(luaFile) &&
-      luaL_dofile(L_lvl, to_str(luaFile)) == LUA_OK) {
+  if (res->getLevelProcLua(levelIndex).has_value() &&
+      luaL_dofile(L_lvl, res->convert_to_str(
+                             *res->getLevelProcLua(levelIndex).value())) ==
+          LUA_OK) {
     override_file_fns(L_lvl, l_state);
-  } else if (std::filesystem::exists(luaFile)) {
+  } else if (res->getLevelProcLua(levelIndex).has_value()) {
     std::cout << "[C] No Good" << std::endl;
     luaL_error(L_lvl, "Error: %s\n", lua_tostring(L_lvl, -1));
     return EXIT_FAILURE;
@@ -126,7 +138,8 @@ int main(int argc, char **argv) {
   window.setView(view);
   sf::Clock deltaClock;
   sf::Font font;
-  font.loadFromFile(to_str(res.fontFile));
+  const char *ff = res->convert_to_str(*res->getFontFile());
+  font.loadFromFile(ff);
 
   MessageBox intro;
   MessageBox win;
@@ -156,7 +169,6 @@ int main(int argc, char **argv) {
       }
     } else if (scene == Scene::WIN) {
       lua_onwin(l_state->onwin);
-      // window.close();
     } else if (scene == Scene::LOSS) {
       lua_onloss(l_state->onloss);
     }

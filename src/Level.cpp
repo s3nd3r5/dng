@@ -27,17 +27,20 @@
 #include "Level.h"
 #include "SfmlUtils.h"
 #include <fstream>
-#include <iostream>
 #include <string>
 
-bool canStep(Pos pos, int dx, int dy, std::vector<std::vector<char>> map) {
+bool canStep(const Pos &pos, int dx, int dy,
+             std::vector<std::vector<char>> map) {
   return map[pos.y + dy][pos.x + dx] != WALL_SPACE;
 }
 
-void Level::loadLevelFromFile(const char *filePath) {
-  std::ifstream mapFile(filePath);
+Level::Level(const char *filePath) {
+  this->file = std::make_unique<std::string>(filePath);
+}
+
+void Level::load() {
+  std::ifstream mapFile(this->file->c_str());
   if (mapFile.is_open()) {
-    this->file = filePath;
     // each element in the map has a unique ID
     // some magic but player is always 0
     const int playerId = 0;
@@ -96,51 +99,11 @@ void Level::reset() {
   this->treasurePositions.clear();
   this->displayMap.clear();
   this->enemyPositions.clear();
-  this->loadLevelFromFile(this->file);
+  this->load();
 }
 
-bool Level::isEmpty(int x, int y) { return map[y][x] == BLANK_SPACE; }
-
-bool Level::playerCanStep(int dx, int dy) {
+bool Level::playerCanStep(int dx, int dy) const {
   return canStep(player, dx, dy, map);
-}
-
-void Level::print() {
-  int x = 0;
-  int y = 0;
-  for (auto &row : map) {
-    for (auto &tile : row) {
-      bool printed = false;
-      if (player.x == x && player.y == y) {
-        std::cout << "p";
-        printed = true;
-      }
-      for (auto pos : enemyPositions) {
-        if (pos.x == x && pos.y == y) {
-          std::cout << "e";
-          printed = true;
-        }
-      }
-      for (auto pos : treasurePositions) {
-        if (pos.x == x && pos.y == y) {
-          std::cout << "t";
-          printed = true;
-        }
-      }
-      if (tile == WALL_SPACE) {
-        std::cout << tile;
-        printed = true;
-      }
-      if (!printed) {
-        std::cout << " ";
-      }
-      std::cout << " ";
-      ++x;
-    }
-    std::cout << "\n";
-    ++y;
-    x = 0;
-  }
 }
 
 int Level::nextId() { return idCounter++; }
@@ -154,8 +117,8 @@ int Level::getEnemyIndex(int id) {
 
   return -1;
 }
-bool Level::enemyCanStep(Pos pos, int dx, int dy) {
+bool Level::enemyCanStep(const Pos &pos, int dx, int dy) const {
   return canStep(pos, dx, dy, map);
 }
-int Level::getWidth() { return this->width; }
-int Level::getHeight() { return this->height; }
+int Level::getWidth() const { return this->width; }
+int Level::getHeight() const { return this->height; }

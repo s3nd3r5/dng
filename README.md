@@ -5,11 +5,14 @@ treasure!
 
 ## How to run
 
-You can run the game by `dng path/to/map/lvl`
+To run the game you can just launch `dng` or `dng.exe` on windows.
 
-To run the first level:
+Follow the onscreen prompts to load a level and play!
 
-`dng maps/lvl1`
+### Configurations
+
+By default the game will look for its configuration file in a few OS specific places.
+The default config is bundled along side the executable: `config.toml`
 
 ## Create your own level!
 

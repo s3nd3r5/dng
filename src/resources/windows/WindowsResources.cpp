@@ -23,55 +23,32 @@
 //    distribution.
 //
 //========================================================================
+#include "../Resources.h"
+#include <libloaderapi.h>
+#define MAX_BUF_SIZE 1024
+class WindowsResources : public Resources {
 
-#ifndef DNG_LEVEL_H
-#define DNG_LEVEL_H
+protected:
+  std::filesystem::path exeDir;
+  std::filesystem::path workingDir;
 
-#include "SFML/Graphics/RectangleShape.hpp"
-#include <memory>
-#include <vector>
-
-// tokens from map file
-static const char PLAYER_TKN = 'p';
-static const char WALL_TKN = 'w';
-static const char EMPTY_TKN = '0';
-static const char TREASURE_TKN = 't';
-static const char ENEMY_TKN = 'e';
-static const char BLANK_SPACE = '\0';
-static const char WALL_SPACE = '#';
-
-struct Pos {
-  int id;
-  int x;
-  int y;
-  sf::RectangleShape sprite;
-};
-
-class Level {
+  std::vector<std::filesystem::path> levelSearchDirs() override {
+    return {workingDir / "maps", exeDir / "maps"};
+  }
+  std::vector<std::filesystem::path> defaultsSearchDirs() override {
+    return {workingDir / "dnglib", exeDir / "dnglib"};
+  }
+  std::vector<std::filesystem::path> fontSearchDirs() override {
+    return {workingDir / "res", exeDir / "res"};
+  }
 
 public:
-  explicit Level(const char *filePath);
-  ~Level() = default;
-  void load();
-  bool playerCanStep(int dx, int dy) const;
-  int getEnemyIndex(int id);
-  bool enemyCanStep(const Pos &pos, int dx, int dy) const;
-  void reset();
-  int nextId();
-  int getWidth() const;
-  int getHeight() const;
-
-  std::vector<std::vector<char>> map; // source copy of map
-  std::vector<sf::RectangleShape> displayMap;
-  Pos player;
-  std::vector<Pos> enemyPositions;
-  std::vector<Pos> treasurePositions;
-
-private:
-  int idCounter = 1; // defaults at 1 (player always 0)
-  int width{};
-  int height{};
-  std::unique_ptr<std::string> file;
+  const char *convert_to_str(std::filesystem::path &path) override {
+    std::setlocale(LC_ALL, "en_US.utf8"); // TODO more support?
+    const wchar_t *wstr = path.c_str();
+    size_t len = std::wcslen(wstr) + 1; // gotta get that \0
+    char *ret = static_cast<char *>(malloc(sizeof(char) * len)); // buffered
+    std::wcstombs(ret, path.c_str(), len);
+    return ret;
+  }
 };
-
-#endif // DNG_LEVEL_H

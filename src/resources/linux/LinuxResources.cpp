@@ -24,54 +24,28 @@
 //
 //========================================================================
 
-#ifndef DNG_LEVEL_H
-#define DNG_LEVEL_H
+#include "LinuxResources.h"
 
-#include "SFML/Graphics/RectangleShape.hpp"
-#include <memory>
-#include <vector>
+LinuxResources::LinuxResources() : Resources() {
+  this->workingDir = std::filesystem::current_path();
+  this->exeDir = std::filesystem::canonical("/proc/self/exe").remove_filename();
+  // set an initial value - will get hardset in load if found
+  std::filesystem::path f =
+      workingDir / "res" / DEFAULT_FONT; // default as fallback
+  this->font = std::make_shared<std::filesystem::path>(f);
+  this->defaultsLua = std::make_shared<std::filesystem::path>();
+}
 
-// tokens from map file
-static const char PLAYER_TKN = 'p';
-static const char WALL_TKN = 'w';
-static const char EMPTY_TKN = '0';
-static const char TREASURE_TKN = 't';
-static const char ENEMY_TKN = 'e';
-static const char BLANK_SPACE = '\0';
-static const char WALL_SPACE = '#';
+std::vector<std::filesystem::path> LinuxResources::levelSearchDirs() {
+  return {workingDir / "maps", exeDir / "maps"};
+}
+std::vector<std::filesystem::path> LinuxResources::defaultsSearchDirs() {
+  return {workingDir / "dnglib", exeDir / "dnglib"};
+}
+std::vector<std::filesystem::path> LinuxResources::fontSearchDirs() {
+  return {workingDir / "res", exeDir / "res"};
+}
 
-struct Pos {
-  int id;
-  int x;
-  int y;
-  sf::RectangleShape sprite;
-};
-
-class Level {
-
-public:
-  explicit Level(const char *filePath);
-  ~Level() = default;
-  void load();
-  bool playerCanStep(int dx, int dy) const;
-  int getEnemyIndex(int id);
-  bool enemyCanStep(const Pos &pos, int dx, int dy) const;
-  void reset();
-  int nextId();
-  int getWidth() const;
-  int getHeight() const;
-
-  std::vector<std::vector<char>> map; // source copy of map
-  std::vector<sf::RectangleShape> displayMap;
-  Pos player;
-  std::vector<Pos> enemyPositions;
-  std::vector<Pos> treasurePositions;
-
-private:
-  int idCounter = 1; // defaults at 1 (player always 0)
-  int width{};
-  int height{};
-  std::unique_ptr<std::string> file;
-};
-
-#endif // DNG_LEVEL_H
+const char *LinuxResources::convert_to_str(std::filesystem::path &path) {
+  return path.c_str();
+}

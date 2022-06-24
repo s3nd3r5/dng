@@ -24,54 +24,22 @@
 //
 //========================================================================
 
-#ifndef DNG_LEVEL_H
-#define DNG_LEVEL_H
-
-#include "SFML/Graphics/RectangleShape.hpp"
-#include <memory>
-#include <vector>
-
-// tokens from map file
-static const char PLAYER_TKN = 'p';
-static const char WALL_TKN = 'w';
-static const char EMPTY_TKN = '0';
-static const char TREASURE_TKN = 't';
-static const char ENEMY_TKN = 'e';
-static const char BLANK_SPACE = '\0';
-static const char WALL_SPACE = '#';
-
-struct Pos {
-  int id;
-  int x;
-  int y;
-  sf::RectangleShape sprite;
-};
-
-class Level {
-
+#ifndef DNG_LINUXRESOURCES_H
+#define DNG_LINUXRESOURCES_H
+#include "../Resources.h"
+class LinuxResources : public Resources {
 public:
-  explicit Level(const char *filePath);
-  ~Level() = default;
-  void load();
-  bool playerCanStep(int dx, int dy) const;
-  int getEnemyIndex(int id);
-  bool enemyCanStep(const Pos &pos, int dx, int dy) const;
-  void reset();
-  int nextId();
-  int getWidth() const;
-  int getHeight() const;
+  LinuxResources();
 
-  std::vector<std::vector<char>> map; // source copy of map
-  std::vector<sf::RectangleShape> displayMap;
-  Pos player;
-  std::vector<Pos> enemyPositions;
-  std::vector<Pos> treasurePositions;
+protected:
+public:
+  const char *convert_to_str(std::filesystem::path &path) override;
 
-private:
-  int idCounter = 1; // defaults at 1 (player always 0)
-  int width{};
-  int height{};
-  std::unique_ptr<std::string> file;
+protected:
+  std::filesystem::path exeDir;
+  std::filesystem::path workingDir;
+  std::vector<std::filesystem::path> levelSearchDirs() override;
+  std::vector<std::filesystem::path> defaultsSearchDirs() override;
+  std::vector<std::filesystem::path> fontSearchDirs() override;
 };
-
-#endif // DNG_LEVEL_H
+#endif // DNG_LINUXRESOURCES_H
