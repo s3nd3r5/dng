@@ -52,20 +52,21 @@ int main(int argc, char **argv) {
 
 #ifdef __linux__
   Resources *res = new LinuxResources();
-  res->loadDefaultLuaFile();
-  res->loadFontFiles();
-  res->loadLevels();
 #endif // __linux__
 #ifdef _WIN32
   Resources *res = new WindowsResources();
 #endif
+  res->loadDefaultLuaFile();
+  res->loadFontFiles();
+  res->loadLevels();
 
   int levelIndex = 0;
   std::cout << "Select level from list: " << std::endl;
   int i = 0;
   for (auto &p : res->getLevels()) {
-    std::cout << "\t[" << i++ << "] " << p.parent_path().filename().c_str()
-              << "/" << p.filename().c_str() << std::endl;
+    std::cout << "\t[" << i++ << "] "
+              << p.parent_path().filename().generic_string() << "/"
+              << p.filename().generic_string() << std::endl;
   }
   std::cout << "Enter Number: ";
   std::cin >> levelIndex;

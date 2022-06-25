@@ -56,6 +56,7 @@ protected:
   virtual vector<filesystem::path> fontSearchDirs() = 0;
 
 public:
+  Resources();
   void loadLevels();
   void loadFontFiles();
   void loadDefaultLuaFile();

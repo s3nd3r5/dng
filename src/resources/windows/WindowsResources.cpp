@@ -23,32 +23,36 @@
 //    distribution.
 //
 //========================================================================
-#include "../Resources.h"
+#include "WindowsResources.h"
 #include <libloaderapi.h>
 #define MAX_BUF_SIZE 1024
-class WindowsResources : public Resources {
+std::filesystem::path exeDir;
+std::filesystem::path workingDir;
 
-protected:
-  std::filesystem::path exeDir;
-  std::filesystem::path workingDir;
+std::vector<std::filesystem::path> WindowsResources::levelSearchDirs() {
+  return {workingDir / "maps", exeDir / "maps"};
+}
+std::vector<std::filesystem::path> WindowsResources::defaultsSearchDirs() {
+  return {workingDir / "dnglib", exeDir / "dnglib"};
+}
+std::vector<std::filesystem::path> WindowsResources::fontSearchDirs() {
+  return {workingDir / "res", exeDir / "res"};
+}
+WindowsResources::WindowsResources() : Resources() {
+  this->workingDir = std::filesystem::current_path();
+  this->font = std::make_shared<std::filesystem::path>(workingDir / "res" /
+                                                           DEFAULT_FONT);
 
-  std::vector<std::filesystem::path> levelSearchDirs() override {
-    return {workingDir / "maps", exeDir / "maps"};
-  }
-  std::vector<std::filesystem::path> defaultsSearchDirs() override {
-    return {workingDir / "dnglib", exeDir / "dnglib"};
-  }
-  std::vector<std::filesystem::path> fontSearchDirs() override {
-    return {workingDir / "res", exeDir / "res"};
-  }
+  char exe_dir_str[255];
+  GetModuleFileNameA(nullptr, exe_dir_str, 255);
+  this->exeDir = std::filesystem::path{exe_dir_str}.remove_filename();
+}
 
-public:
-  const char *convert_to_str(std::filesystem::path &path) override {
-    std::setlocale(LC_ALL, "en_US.utf8"); // TODO more support?
-    const wchar_t *wstr = path.c_str();
-    size_t len = std::wcslen(wstr) + 1; // gotta get that \0
-    char *ret = static_cast<char *>(malloc(sizeof(char) * len)); // buffered
-    std::wcstombs(ret, path.c_str(), len);
-    return ret;
-  }
-};
+const char *WindowsResources::convert_to_str(std::filesystem::path &path) {
+  std::setlocale(LC_ALL, "en_US.utf8"); // TODO more support?
+  const wchar_t *wstr = path.c_str();
+  size_t len = std::wcslen(wstr) + 1; // gotta get that \0
+  char *ret = static_cast<char *>(malloc(sizeof(char) * len)); // buffered
+  std::wcstombs(ret, path.c_str(), len);
+  return ret;
+}

@@ -29,6 +29,10 @@
 
 #include "../Resources.h"
 class WindowsResources : public Resources {
+public:
+  WindowsResources();
+  const char *convert_to_str(std::filesystem::path &path) override;
+
 protected:
   std::filesystem::path exeDir;
   std::filesystem::path workingDir;
