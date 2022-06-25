@@ -29,6 +29,11 @@
 #include <cassert>
 #include <iostream>
 
+Resources::Resources() {
+  this->font = std::make_shared<std::filesystem::path>();
+  this->defaultsLua = std::make_shared<std::filesystem::path>();
+}
+
 void Resources::loadFontFiles() {
   // We will search 1 level deep
   for (auto &base : this->fontSearchDirs()) {
