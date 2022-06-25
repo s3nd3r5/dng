@@ -115,14 +115,9 @@ Once you build the project you can execute it by:
 
 ```shell
 # use your build dir and select a map!
-./cmake-build/dng ./path/to/map/lvl
+./cmake-build/dng
 ```
 
-To launch level 1 for example:
-
-```shell
-./cmake-build/dng ./maps/lvl1
-```
 
 Note: You need to use the working directory containing the `include` folder!
 
