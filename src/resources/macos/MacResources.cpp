@@ -26,7 +26,7 @@
 //========================================================================
 
 #include "MacResources.h"
-namespace std::filesystem = std::experimental::filesystem;
+namespace fs = std::experimental::filesystem;
 
 MacResources::MacResources() : Resources() {
   this->workingDir = std::filesystem::current_path();

@@ -34,16 +34,12 @@
 #include "resources/Resources.h"
 #ifdef __linux__
 #include "resources/linux/LinuxResources.h"
-#include <filesystem>
 #endif // __linux__
 #ifdef _WIN32
 #include "resources/windows/WindowsResources.h"
-#include <filesystem>
 #endif // _WIN32
 #ifdef __APPLE__
 #include "resources/macos/MacResources.h"
-#include <experimental/filesystem>
-namespace std::filesystem = std::experimental::filesystem;
 #endif // __APPLE__
 #include <SFML/Graphics.hpp>
 #include <cmath>

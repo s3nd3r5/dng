@@ -30,18 +30,18 @@
 #include <iostream>
 
 Resources::Resources() {
-  this->font = std::make_shared<std::filesystem::path>();
-  this->defaultsLua = std::make_shared<std::filesystem::path>();
+  this->font = std::make_shared<fs::path>();
+  this->defaultsLua = std::make_shared<fs::path>();
 }
 
 void Resources::loadFontFiles() {
   // We will search 1 level deep
   for (auto &base : this->fontSearchDirs()) {
-    if (std::filesystem::exists(base) && std::filesystem::is_directory(base)) {
-      for (auto &item : std::filesystem::directory_iterator(base)) {
+    if (fs::exists(base) && fs::is_directory(base)) {
+      for (auto &item : fs::directory_iterator(base)) {
         // only 1 deep
         if (item.exists() && item.is_directory()) {
-          for (auto &file : std::filesystem::directory_iterator(item)) {
+          for (auto &file : fs::directory_iterator(item)) {
             if (file.exists() && file.is_regular_file()) {
               auto ext = file.path().extension();
               bool matched =
@@ -84,10 +84,10 @@ void Resources::loadFontFiles() {
 
 void Resources::loadLevels() {
   for (auto &base : this->levelSearchDirs()) {
-    if (std::filesystem::exists(base) && std::filesystem::is_directory(base)) {
-      for (auto &dir : std::filesystem::directory_iterator(base)) {
+    if (fs::exists(base) && fs::is_directory(base)) {
+      for (auto &dir : fs::directory_iterator(base)) {
         if (dir.exists() && dir.is_directory()) {
-          if (std::filesystem::exists(dir / DNG_MAP)) {
+          if (fs::exists(dir / DNG_MAP)) {
             this->levels.push_back(dir.path());
           }
         }
@@ -99,42 +99,35 @@ void Resources::loadLevels() {
 void Resources::loadDefaultLuaFile() {
   for (auto &base : this->defaultsSearchDirs()) {
     auto f = base / DEFAULT_LUA;
-    if (std::filesystem::exists(f)) {
+    if (fs::exists(f)) {
       *this->defaultsLua = f;
       break;
     }
   }
 }
-std::vector<std::filesystem::path> Resources::getFontFiles() {
-  return this->fonts;
-}
-std::vector<std::filesystem::path> Resources::getLevels() {
-  return this->levels;
-}
-shared_ptr<std::filesystem::path> Resources::getFontFile() {
-  return this->font;
-}
-shared_ptr<std::filesystem::path> Resources::updateFont(int idx) {
+std::vector<fs::path> Resources::getFontFiles() { return this->fonts; }
+std::vector<fs::path> Resources::getLevels() { return this->levels; }
+shared_ptr<fs::path> Resources::getFontFile() { return this->font; }
+shared_ptr<fs::path> Resources::updateFont(int idx) {
   auto f = this->fonts[idx];
   *this->font = f;
   return getFontFile();
 }
-shared_ptr<std::filesystem::path> Resources::getDefaultsLuaFile() {
+shared_ptr<fs::path> Resources::getDefaultsLuaFile() {
   return this->defaultsLua;
 }
-shared_ptr<std::filesystem::path> Resources::getLevelMap(int idx) {
+shared_ptr<fs::path> Resources::getLevelMap(int idx) {
   auto lvlBase = this->levels[idx];
-  std::filesystem::path dngMap = lvlBase / DNG_MAP;
+  fs::path dngMap = lvlBase / DNG_MAP;
   // existence of the level dng.map is asserted in the initializer
-  assert(std::filesystem::exists(dngMap));
-  return std::make_shared<std::filesystem::path>(dngMap);
+  assert(fs::exists(dngMap));
+  return std::make_shared<fs::path>(dngMap);
 }
-std::optional<shared_ptr<std::filesystem::path>>
-Resources::getLevelProcLua(int idx) {
+std::optional<shared_ptr<fs::path>> Resources::getLevelProcLua(int idx) {
   auto lvlBase = this->levels[idx];
   auto procLua = lvlBase / PROC_LUA;
   if (exists(procLua)) {
-    return std::make_shared<std::filesystem::path>(procLua);
+    return std::make_shared<fs::path>(procLua);
   } else {
     return nullopt;
   }

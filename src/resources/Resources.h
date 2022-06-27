@@ -30,9 +30,10 @@
 
 #ifdef __APPLE__
 #include <experimental/filesystem>
-namespace std::filesystem = std::experimental::filesystem;
+namespace fs = std::experimental::filesystem;
 #else
 #include <filesystem>
+namespace fs = std::filesystem;
 #endif
 #include <optional>
 #include <vector>
@@ -53,7 +54,7 @@ static const char *DEFAULT_FONT = "PressStart2P-vaV7.ttf";
 class Resources {
 
 protected:
-  shared_ptr<std::filesystem::path> font;   // chosen font
+  shared_ptr<fs::path> font;                // chosen font
   shared_ptr<filesystem::path> defaultsLua; // defaults lua file
   vector<filesystem::path> fonts;           // all found maps
   vector<filesystem::path> levels;          // all found maps
@@ -68,11 +69,11 @@ public:
   void loadDefaultLuaFile();
   vector<filesystem::path> getFontFiles();
   vector<filesystem::path> getLevels();
-  shared_ptr<std::filesystem::path> updateFont(int idx);
-  shared_ptr<std::filesystem::path> getFontFile();
-  shared_ptr<std::filesystem::path> getDefaultsLuaFile();
-  shared_ptr<std::filesystem::path> getLevelMap(int idx);
-  optional<shared_ptr<std::filesystem::path>> getLevelProcLua(int idx);
+  shared_ptr<fs::path> updateFont(int idx);
+  shared_ptr<fs::path> getFontFile();
+  shared_ptr<fs::path> getDefaultsLuaFile();
+  shared_ptr<fs::path> getLevelMap(int idx);
+  optional<shared_ptr<fs::path>> getLevelProcLua(int idx);
   /* Helper method to convert any path to a const char *
    * Windows uses wchar_t so this can help provide a common way to
    * interact with files
