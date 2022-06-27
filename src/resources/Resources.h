@@ -2,6 +2,7 @@
 // dng
 //------------------------------------------------------------------------
 // Copyright (c) 2022 Steph Enders <steph@senders.io>
+// Copyright (c) 2022 Dan Enders
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -27,7 +28,12 @@
 #ifndef DNG_RESOURCES_H
 #define DNG_RESOURCES_H
 
+#ifdef __APPLE__
+#include <experimental/filesystem>
+namespace std::filesystem = std::experimental::filesystem;
+#else
 #include <filesystem>
+#endif
 #include <optional>
 #include <vector>
 

@@ -57,10 +57,12 @@ set(LUA_LIBRARIES lua lualib lauxlib)
 include_directories(${PROJECT_SOURCE_DIR}/thirdparty/lua)
 
 # System specific includes
-if (UNIX)
+if (UNIX AND NOT APPLE) 
     set(RES_LIB src/resources/Resources.cpp src/resources/Resources.h src/resources/linux/LinuxResources.cpp src/resources/linux/LinuxResources.h)
 elseif (WIN32)
     set(RES_LIB src/resources/Resources.cpp src/resources/Resources.h src/resources/windows/WindowsResources.cpp src/resources/windows/WindowsResources.h)
+elseif (APPLE)
+    set(RES_LIB src/resources/Resources.cpp src/resources/Resources.h src/resources/macos/MacResources.cpp src/resources/macos/MacResources.h)
 endif ()
 
 add_executable(${PROJECT_NAME} src/main.cpp src/Level.cpp src/Level.h src/CApi.h src/Scene.h src/LuaApi.h src/MessageBox.h ${RES_LIB})
