@@ -59,6 +59,9 @@ int main(int argc, char **argv) {
 #ifdef _WIN32
   Resources *res = new WindowsResources();
 #endif
+#ifdef __APPLE__
+  Resources *res = new MacResources();
+#endif
   res->loadDefaultLuaFile();
   res->loadFontFiles();
   res->loadLevels();

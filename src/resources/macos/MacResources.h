@@ -29,21 +29,19 @@
 #define DNG_MACRESOURCES_H
 #include "../Resources.h"
 
-namespace fs = std::experimental::filesystem;
-
 class MacResources : public Resources {
 public:
   MacResources();
 
 protected:
 public:
-  const char *convert_to_str(fs::path &path) override;
+  const char *convert_to_str(filesystem::path &path) override;
 
 protected:
-  fs::path exeDir;
-  fs::path workingDir;
-  std::vector<fs::path> levelSearchDirs() override;
-  std::vector<fs::path> defaultsSearchDirs() override;
-  std::vector<fs::path> fontSearchDirs() override;
+  filesystem::path exeDir;
+  filesystem::path workingDir;
+  std::vector<filesystem::path> levelSearchDirs() override;
+  std::vector<filesystem::path> defaultsSearchDirs() override;
+  std::vector<filesystem::path> fontSearchDirs() override;
 };
 #endif // DNG_MACRESOURCES_H

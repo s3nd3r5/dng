@@ -26,28 +26,26 @@
 //========================================================================
 
 #include "MacResources.h"
-namespace fs = std::experimental::filesystem;
 
 MacResources::MacResources() : Resources() {
-  this->workingDir = std::filesystem::current_path();
-  this->exeDir = std::filesystem::canonical("/proc/self/exe").remove_filename();
+  this->workingDir = filesystem::current_path();
+  this->exeDir = filesystem::canonical("/proc/self/exe").remove_filename();
   // set an initial value - will get hardset in load if found
-  std::filesystem::path f =
-      workingDir / "res" / DEFAULT_FONT; // default as fallback
-  this->font = std::make_shared<std::filesystem::path>(f);
-  this->defaultsLua = std::make_shared<std::filesystem::path>();
+  filesystem::path f = workingDir / "res" / DEFAULT_FONT; // default as fallback
+  this->font = std::make_shared<filesystem::path>(f);
+  this->defaultsLua = std::make_shared<filesystem::path>();
 }
 
-std::vector<std::filesystem::path> MacResources::levelSearchDirs() {
+std::vector<filesystem::path> MacResources::levelSearchDirs() {
   return {workingDir / "maps", exeDir / "maps"};
 }
-std::vector<std::filesystem::path> MacResources::defaultsSearchDirs() {
+std::vector<filesystem::path> MacResources::defaultsSearchDirs() {
   return {workingDir / "dnglib", exeDir / "dnglib"};
 }
-std::vector<std::filesystem::path> MacResources::fontSearchDirs() {
+std::vector<filesystem::path> MacResources::fontSearchDirs() {
   return {workingDir / "res", exeDir / "res"};
 }
 
-const char *MacResources::convert_to_str(std::filesystem::path &path) {
+const char *MacResources::convert_to_str(filesystem::path &path) {
   return path.c_str();
 }

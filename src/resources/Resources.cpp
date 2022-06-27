@@ -30,50 +30,50 @@
 #include <iostream>
 
 Resources::Resources() {
-  this->font = std::make_shared<fs::path>();
-  this->defaultsLua = std::make_shared<fs::path>();
+  this->font = std::make_shared<filesystem::path>();
+  this->defaultsLua = std::make_shared<filesystem::path>();
 }
 
 void Resources::loadFontFiles() {
   // We will search 1 level deep
   for (auto &base : this->fontSearchDirs()) {
-    if (fs::exists(base) && fs::is_directory(base)) {
-      for (auto &item : fs::directory_iterator(base)) {
+    if (filesystem::exists(base) && filesystem::is_directory(base)) {
+      for (auto &item : filesystem::directory_iterator(base)) {
         // only 1 deep
-        if (item.exists() && item.is_directory()) {
-          for (auto &file : fs::directory_iterator(item)) {
-            if (file.exists() && file.is_regular_file()) {
-              auto ext = file.path().extension();
+        if (filesystem::exists(item) && filesystem::is_directory(item)) {
+          for (auto &file : filesystem::directory_iterator(item)) {
+            if (filesystem::exists(file) && filesystem::is_regular_file(file)) {
+              auto ext = filesystem::path(file).extension();
               bool matched =
                   std::any_of(std::begin(FONT_TYPES), std::end(FONT_TYPES),
                               [ext](auto &supported) {
                                 return supported == ext.generic_string();
                               });
               if (matched) {
-                fonts.push_back(file.path());
+                fonts.emplace_back(file);
                 // set default if not set
-                if (!exists(*this->font) ||
-                    !is_regular_file(*this->font) &&
-                        file.path().filename() == DEFAULT_FONT) {
-                  *this->font = file.path();
+                if ((!filesystem::exists(*this->font) ||
+                     !filesystem::is_regular_file(*this->font)) &&
+                    filesystem::path(file).filename() == DEFAULT_FONT) {
+                  *this->font = filesystem::path(file);
                 }
               }
             }
           }
-        } else if (item.is_regular_file()) {
-          auto ext = item.path().extension();
+        } else if (filesystem::is_regular_file(item)) {
+          auto ext = filesystem::path(item).extension();
           bool matched =
               std::any_of(std::begin(FONT_TYPES), std::end(FONT_TYPES),
                           [ext](auto &supported) {
                             return supported == ext.generic_string();
                           });
           if (matched) {
-            fonts.push_back(item.path());
+            fonts.emplace_back(item);
             // set default if not set
-            if (!exists(*this->font) ||
-                !is_regular_file(*this->font) &&
-                    item.path().filename() == DEFAULT_FONT) {
-              *this->font = item.path();
+            if ((!filesystem::exists(*this->font) ||
+                 !filesystem::is_regular_file(*this->font)) &&
+                filesystem::path(item).filename() == DEFAULT_FONT) {
+              *this->font = filesystem::path(item);
             }
           }
         }
@@ -84,11 +84,11 @@ void Resources::loadFontFiles() {
 
 void Resources::loadLevels() {
   for (auto &base : this->levelSearchDirs()) {
-    if (fs::exists(base) && fs::is_directory(base)) {
-      for (auto &dir : fs::directory_iterator(base)) {
-        if (dir.exists() && dir.is_directory()) {
-          if (fs::exists(dir / DNG_MAP)) {
-            this->levels.push_back(dir.path());
+    if (filesystem::exists(base) && filesystem::is_directory(base)) {
+      for (auto &dir : filesystem::directory_iterator(base)) {
+        if (filesystem::exists(dir) && filesystem::is_directory(dir)) {
+          if (filesystem::exists(dir / DNG_MAP)) {
+            this->levels.emplace_back(dir);
           }
         }
       }
@@ -99,36 +99,43 @@ void Resources::loadLevels() {
 void Resources::loadDefaultLuaFile() {
   for (auto &base : this->defaultsSearchDirs()) {
     auto f = base / DEFAULT_LUA;
-    if (fs::exists(f)) {
+    if (filesystem::exists(f)) {
       *this->defaultsLua = f;
       break;
     }
   }
 }
-std::vector<fs::path> Resources::getFontFiles() { return this->fonts; }
-std::vector<fs::path> Resources::getLevels() { return this->levels; }
-shared_ptr<fs::path> Resources::getFontFile() { return this->font; }
-shared_ptr<fs::path> Resources::updateFont(int idx) {
+std::vector<filesystem::path> Resources::getFontFiles() { return this->fonts; }
+std::vector<filesystem::path> Resources::getLevels() { return this->levels; }
+std::shared_ptr<filesystem::path> Resources::getFontFile() {
+  return this->font;
+}
+std::shared_ptr<filesystem::path> Resources::updateFont(int idx) {
   auto f = this->fonts[idx];
   *this->font = f;
   return getFontFile();
 }
-shared_ptr<fs::path> Resources::getDefaultsLuaFile() {
+std::shared_ptr<filesystem::path> Resources::getDefaultsLuaFile() {
   return this->defaultsLua;
 }
-shared_ptr<fs::path> Resources::getLevelMap(int idx) {
+std::shared_ptr<filesystem::path> Resources::getLevelMap(int idx) {
   auto lvlBase = this->levels[idx];
-  fs::path dngMap = lvlBase / DNG_MAP;
+  filesystem::path dngMap = lvlBase / DNG_MAP;
   // existence of the level dng.map is asserted in the initializer
-  assert(fs::exists(dngMap));
-  return std::make_shared<fs::path>(dngMap);
+  assert(filesystem::exists(dngMap));
+  return std::make_shared<filesystem::path>(dngMap);
 }
-std::optional<shared_ptr<fs::path>> Resources::getLevelProcLua(int idx) {
+optional<std::shared_ptr<filesystem::path>>
+Resources::getLevelProcLua(int idx) {
   auto lvlBase = this->levels[idx];
   auto procLua = lvlBase / PROC_LUA;
   if (exists(procLua)) {
-    return std::make_shared<fs::path>(procLua);
+    return std::make_shared<filesystem::path>(procLua);
   } else {
+#ifdef __APPLE__
+    return boost::optional<std::shared_ptr<filesystem::path>>();
+#else
     return nullopt;
+#endif
   }
 }

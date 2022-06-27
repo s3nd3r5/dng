@@ -203,7 +203,16 @@ static int c_get_treasures(lua_State *L) {
 static int c_score_treasure(lua_State *L) {
   int id = static_cast<int>(lua_tonumber(L, -1));
 
+#ifdef __APPLE__
+  for (int i = 0; i < lvl->treasurePositions.size(); i++) {
+    if (lvl->treasurePositions[i].id == id) {
+      lvl->treasurePositions.erase(lvl->treasurePositions.begin() + i);
+      break;
+    }
+  }
+#else
   erase_if(lvl->treasurePositions, [id](Pos t) { return t.id == id; });
+#endif
 
   return 1;
 }

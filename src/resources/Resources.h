@@ -29,13 +29,15 @@
 #define DNG_RESOURCES_H
 
 #ifdef __APPLE__
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
+#include "boost/filesystem.hpp"
+#include "boost/optional.hpp"
+using namespace boost;
 #else
 #include <filesystem>
-namespace fs = std::filesystem;
-#endif
 #include <optional>
+using namespace std;
+#endif
+#include <memory>
 #include <vector>
 
 // struct LevelInfo {
@@ -43,9 +45,8 @@ namespace fs = std::filesystem;
 //   filesystem::path dngMap;
 //   optional<filesystem::path> procLua;
 // };
-using namespace std;
 
-static const string FONT_TYPES[] = {".otf", ".ttf"};
+static const std::string FONT_TYPES[] = {".otf", ".ttf"};
 static const filesystem::path DEFAULT_LUA{"defaults.lua"};
 static const filesystem::path DNG_MAP{"dng.map"};
 static const filesystem::path PROC_LUA{"proc.lua"};
@@ -54,26 +55,26 @@ static const char *DEFAULT_FONT = "PressStart2P-vaV7.ttf";
 class Resources {
 
 protected:
-  shared_ptr<fs::path> font;                // chosen font
-  shared_ptr<filesystem::path> defaultsLua; // defaults lua file
-  vector<filesystem::path> fonts;           // all found maps
-  vector<filesystem::path> levels;          // all found maps
-  virtual vector<filesystem::path> levelSearchDirs() = 0;
-  virtual vector<filesystem::path> defaultsSearchDirs() = 0;
-  virtual vector<filesystem::path> fontSearchDirs() = 0;
+  std::shared_ptr<filesystem::path> font;        // chosen font
+  std::shared_ptr<filesystem::path> defaultsLua; // defaults lua file
+  std::vector<filesystem::path> fonts;           // all found maps
+  std::vector<filesystem::path> levels;          // all found maps
+  virtual std::vector<filesystem::path> levelSearchDirs() = 0;
+  virtual std::vector<filesystem::path> defaultsSearchDirs() = 0;
+  virtual std::vector<filesystem::path> fontSearchDirs() = 0;
 
 public:
   Resources();
   void loadLevels();
   void loadFontFiles();
   void loadDefaultLuaFile();
-  vector<filesystem::path> getFontFiles();
-  vector<filesystem::path> getLevels();
-  shared_ptr<fs::path> updateFont(int idx);
-  shared_ptr<fs::path> getFontFile();
-  shared_ptr<fs::path> getDefaultsLuaFile();
-  shared_ptr<fs::path> getLevelMap(int idx);
-  optional<shared_ptr<fs::path>> getLevelProcLua(int idx);
+  std::vector<filesystem::path> getFontFiles();
+  std::vector<filesystem::path> getLevels();
+  std::shared_ptr<filesystem::path> updateFont(int idx);
+  std::shared_ptr<filesystem::path> getFontFile();
+  std::shared_ptr<filesystem::path> getDefaultsLuaFile();
+  std::shared_ptr<filesystem::path> getLevelMap(int idx);
+  optional<std::shared_ptr<filesystem::path>> getLevelProcLua(int idx);
   /* Helper method to convert any path to a const char *
    * Windows uses wchar_t so this can help provide a common way to
    * interact with files

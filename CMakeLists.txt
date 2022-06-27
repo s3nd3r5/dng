@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 20)
 if (WIN32)
     set(CMAKE_CXX_FLAGS -static)
 endif ()
+if (APPLE)
+    set(CMAKE_CXX_FLAGS -std=c++11) # why? Because apparently we can't modernize
+endif ()
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-${PROJECT_VERSION})
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON)
 
@@ -56,8 +59,17 @@ target_link_libraries(lauxlib lua)
 set(LUA_LIBRARIES lua lualib lauxlib)
 include_directories(${PROJECT_SOURCE_DIR}/thirdparty/lua)
 
+# setup boost and other MacOS Libs
+set(MACOS_LIBS "")
+if (APPLE)
+    set(DNG_BOOST_DIR ${CMAKE_SOURCE_DIR}/thirdparty/boost)
+    set(BOOST_ROOT ${DNG_BOOST_DIR}/tools/cmake/include/)
+    add_subdirectory(${DNG_BOOST_DIR} EXCLUDE_FROM_ALL)
+    set(MACOS_LIBS ${MACOS_LIBS} Boost::filesystem Boost::optional)
+endif ()
+
 # System specific includes
-if (UNIX AND NOT APPLE) 
+if (UNIX AND NOT APPLE)
     set(RES_LIB src/resources/Resources.cpp src/resources/Resources.h src/resources/linux/LinuxResources.cpp src/resources/linux/LinuxResources.h)
 elseif (WIN32)
     set(RES_LIB src/resources/Resources.cpp src/resources/Resources.h src/resources/windows/WindowsResources.cpp src/resources/windows/WindowsResources.h)
@@ -66,7 +78,6 @@ elseif (APPLE)
 endif ()
 
 add_executable(${PROJECT_NAME} src/main.cpp src/Level.cpp src/Level.h src/CApi.h src/Scene.h src/LuaApi.h src/MessageBox.h ${RES_LIB})
-target_link_libraries(${PROJECT_NAME} PUBLIC ${LUA_LIBRARIES})
 
 # configure and link SFML
 set(BUILD_SHARED_LIBS FALSE)
@@ -77,11 +88,10 @@ if (WIN32)
 endif ()
 set(SFML_USE_SYSTEM_DEPS ON)
 add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/SFML EXCLUDE_FROM_ALL)
-target_link_libraries(${PROJECT_NAME} PUBLIC ${SFML_LIBRARIES} ${LUA_LIBRARIES})
 
+target_link_libraries(${PROJECT_NAME} PUBLIC ${SFML_LIBRARIES} ${LUA_LIBRARIES} ${MACOS_LIBS})
 
 # Install Directives
-
 if (UNIX)
     set(SFML_INSTALL_PKGCONFIG_FILES FALSE)
 endif ()
