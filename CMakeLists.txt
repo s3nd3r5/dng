@@ -69,13 +69,27 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${LUA_LIBRARIES})
 # configure and link SFML
 set(BUILD_SHARED_LIBS FALSE)
 set(SFML_LIBRARIES sfml-system sfml-window sfml-graphics)
-if (WIN32)
-    set(SFML_STATIC TRUE)
-    set(SFML_USE_STATIC_STD_LIBS TRUE)
-endif ()
 set(SFML_USE_SYSTEM_DEPS ON)
+if (WIN32)
+    set(SFML_USE_SYSTEM_DEPS OFF CACHE BOOL "Disabling System Deps")
+    set(SFML_USE_STATIC_STD_LIBS ON CACHE BOOL "Build SFML with Static Libs")
+    set(SFML_STATIC ON CACHE BOOL "Build SFML with Static Libs")
+    set(SFML_LIBRARIES sfml-main sfml-system sfml-window sfml-graphics)
+endif ()
 add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/SFML EXCLUDE_FROM_ALL)
-target_link_libraries(${PROJECT_NAME} PUBLIC ${SFML_LIBRARIES} ${LUA_LIBRARIES})
+if (WIN32)
+    add_compile_options(SFML_STATIC)
+endif ()
+set(SFML_DEPS ${FLAC_LIBRARY}
+        ${FREETYPE_LIBRARY}
+        ${JPEG_LIBRARY}
+        ${OGG_LIBRARY}
+        ${OPENAL_LIBRARY}
+        ${VORBIS_LIBRARY}
+        ${VORBISENC_LIBRARY}
+        ${VORBISFILE_LIBRARY})
+message(STATUS deps ${SFML_DEPS})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${SFML_LIBRARIES} ${LUA_LIBRARIES} ${SFML_DEPS})
 
 
 # Install Directives
@@ -84,10 +98,10 @@ if (UNIX)
     set(SFML_INSTALL_PKGCONFIG_FILES FALSE)
 endif ()
 
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 install(TARGETS ${PROJECT_NAME} DESTINATION .)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res DESTINATION .)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/maps DESTINATION .)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/dnglib DESTINATION .)
+install(FILES ${SFML_DEPS} DESTINATION lib)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE DESTINATION .)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/thirdparty-licenses.txt DESTINATION .)
 
