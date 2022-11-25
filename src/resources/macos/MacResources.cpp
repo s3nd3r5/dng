@@ -29,7 +29,6 @@
 
 MacResources::MacResources() : Resources() {
   this->workingDir = filesystem::current_path();
-  this->exeDir = filesystem::canonical("/proc/self/exe").remove_filename();
   // set an initial value - will get hardset in load if found
   filesystem::path f = workingDir / "res" / DEFAULT_FONT; // default as fallback
   this->font = std::make_shared<filesystem::path>(f);
@@ -37,13 +36,13 @@ MacResources::MacResources() : Resources() {
 }
 
 std::vector<filesystem::path> MacResources::levelSearchDirs() {
-  return {workingDir / "maps", exeDir / "maps"};
+  return {workingDir / "maps"};
 }
 std::vector<filesystem::path> MacResources::defaultsSearchDirs() {
-  return {workingDir / "dnglib", exeDir / "dnglib"};
+  return {workingDir / "dnglib"};
 }
 std::vector<filesystem::path> MacResources::fontSearchDirs() {
-  return {workingDir / "res", exeDir / "res"};
+  return {workingDir / "res"};
 }
 
 const char *MacResources::convert_to_str(filesystem::path &path) {
