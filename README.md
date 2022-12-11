@@ -118,14 +118,25 @@ Once you build the project you can execute it by:
 ./cmake-build/dng
 ```
 
-
 Note: You need to use the working directory containing the `include` folder!
+
+## MacOS
+
+MacOS support is not functional at the moment, but I merged the generic changes in since if I do want to get OSX support for older MacOS systems
+then I need something that isn't dependent on their librarys not including some modern C++ features.
+
+I lack a proper test machine at the moment and struggled to get [Darling](https://www.darlinghq.org/) working properly.
+
+The _biggest_ issue is the fact that I was also unable to pull in a minimum amount of boost libs that I needed, so I had to submodule the entire
+system. Which results in quite a bit of filesize for this tiny project. The executable and shared libs would be much smaller, but the source is hefty.
+Sorry. I'm sure you could get away with /not/ initializing boost and being just fine since Windows and Linux codepaths shouldn't ever call it.
 
 ## External Libraries and Resources used by dng
 
 * [SFML](https://github.com/SFML/SFML) licensed
   under [zlib/png license](https://www.sfml-dev.org/license.php)
-* [Lua](https://github.com/lua/luat) licensed under [MIT license](https://www.lua.org/license.html)
+* [Lua](https://github.com/lua/lua) licensed under [MIT license](https://www.lua.org/license.html)
+* [Boost](https://github.com/boostorg/boost) licensed under [Boost Software License](https://github.com/boostorg/boost/blob/master/LICENSE_1_0.txt)
 * [Press Start 2P Font](https://fonts.google.com/specimen/Press+Start+2P#glyphs) licensed
   under [SIL Open Font License](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL)
 * [Liberation Fonts](https://github.com/liberationfonts/liberation-fonts) licensed
