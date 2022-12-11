@@ -119,6 +119,41 @@ end
 ---@param map table 2D map array
 ---@return table best move to target [x, y]
 ---
+local function best_effort_move(start_pos, target_pos, map)
+  local diff_x = target_pos.x - start_pos.x
+  local diff_y = target_pos.y - start_pos.y
+
+  local move = { dx = 0, dy = 0 }
+
+  if (math.abs(diff_x) > math.abs(diff_y)) then
+    -- do x moves first
+    if diff_x > 0 and can_move(start_pos.x + 1, start_pos.y, map) then
+      move.dx = 1
+      return move
+    elseif diff_x < 0 and can_move(start_pos.x - 1, start_pos.y, map) then
+      move.dx = -1
+      return move
+    end
+  else -- y moves
+    if diff_y > 0 and can_move(start_pos.x, start_pos.y + 1, map) then
+      move.dy = 1
+      return move
+    elseif diff_y < 0 and can_move(start_pos.y, start_pos.y - 1, map) then
+      move.dy = -1
+      return move
+    end
+  end
+  -- return 0, 0 move
+  return move
+end
+
+
+---
+---@param start_pos table [x, y]
+---@param target_pos table [x, y]
+---@param map table 2D map array
+---@return table best move to target [x, y]
+---
 local function pathfind(start_pos, target_pos, map)
     local queue = Queue:new()
     local visit_map = {}
@@ -142,7 +177,9 @@ local function pathfind(start_pos, target_pos, map)
             return { dx = origin.x - start_pos.x, dy = origin.y - start_pos.y }
         end
     end
-    return { dx = 0, dy = 0 }
+
+    --- cannot find path - just move "towards" player
+    return best_effort_move(start_pos, target_pos, map)
 end
 
 return {
