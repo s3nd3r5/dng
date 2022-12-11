@@ -30,6 +30,11 @@
 #include "lua.hpp"
 #include <iostream>
 
+void trap(const char *message) {
+  std::cerr << message << std::endl;
+  exit(EXIT_FAILURE);
+}
+
 struct LState {
   lua_State *onkeypress;
   lua_State *onupdate;
@@ -85,7 +90,8 @@ bool lua_dofn(lua_State *L, const char *fn) {
     std::cout << "[C] Error " << fn << " not function | not found" << std::endl;
     return false;
   }
-  lua_pcall(L, 0, 1, 0);
+  if (lua_pcall(L, 0, 1, 0) != LUA_OK)
+    trap(lua_tostring(L, -1));
   return true;
 }
 
@@ -96,7 +102,8 @@ bool lua_dofn_with_number(lua_State *L, const char *fn, lua_Number num) {
     return false;
   }
   lua_pushnumber(L, num);
-  lua_pcall(L, 1, 1, 0);
+  if (lua_pcall(L, 1, 1, 0) != LUA_OK)
+    trap(lua_tostring(L, -1));
   return true;
 }
 
