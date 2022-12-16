@@ -98,6 +98,9 @@ function onUpdate(dt)
 
     player = c_get_player_position()
     assert(type(player) == "table", "Player is not a table")
+    
+    treasures = c_get_treasures()
+    assert(type(treasures) == "table", "treasures is not a table")
 
     map = c_get_map();
     assert(type(map) == "table", "map is not a table")
@@ -105,10 +108,11 @@ function onUpdate(dt)
     for _, v in ipairs(enemies) do
         local next;
         if diff_time >= MOV_TIME then
-            next = algs.pathfind(v, player, map)
+            next = algs.pathfind(v, player, enemies, treasures, map)
         else
             next = { dx = 0, dy = 0 }
         end
+
         new_pos = c_move_enemy(v.id, next.dx, next.dy)
         assert(type(new_pos) == "table", "new_pos is not a table")
         if new_pos.x == player.x and new_pos.y == player.y then

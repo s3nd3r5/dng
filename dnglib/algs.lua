@@ -151,19 +151,34 @@ end
 ---
 ---@param start_pos table [x, y]
 ---@param target_pos table [x, y]
+-- @param enemies list of enemy positions (cannot pass thru enemy)
+-- @param treasures list of treasure positions (cannot pass thru treasure)
 ---@param map table 2D map array
 ---@return table best move to target [x, y]
 ---
-local function pathfind(start_pos, target_pos, map)
+local function pathfind(start_pos, target_pos, enemies, treasures, map)
     local queue = Queue:new()
+    
     local visit_map = {}
     for k, v in ipairs(map) do
         row = {}
         for ik, iv in ipairs(v) do
             row[ik] = iv
         end
-        visit_map[k] = row
+        visit_map[k] = row 
     end
+
+    for _, e in ipairs(enemies) do
+      if e ~= start_pos then
+        visit_map[e.y][e.x] = MAP_WALL -- use wall value for impass
+      end
+    end
+    for _, t in ipairs(treasures) do
+      visit_map[t.y][t.x] = MAP_WALL -- use wall value for impass
+    end
+    
+    -- since we mutate the visit_map let's calc this early if need be
+    local best_effort = best_effort_move(start_pos, target_pos, visit_map)
 
     if (push_moves(start_pos.x, start_pos.y, nil, visit_map, queue, target_pos)) then
         return { dx = target_pos.x - start_pos.x, dy = target_pos.y - start_pos.y }
@@ -179,7 +194,7 @@ local function pathfind(start_pos, target_pos, map)
     end
 
     --- cannot find path - just move "towards" player
-    return best_effort_move(start_pos, target_pos, map)
+    return best_effort
 end
 
 return {
