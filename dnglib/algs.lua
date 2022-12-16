@@ -125,24 +125,21 @@ local function best_effort_move(start_pos, target_pos, map)
 
   local move = { dx = 0, dy = 0 }
 
-  if (math.abs(diff_x) > math.abs(diff_y)) then
-    -- do x moves first
-    if diff_x > 0 and can_move(start_pos.x + 1, start_pos.y, map) then
-      move.dx = 1
-      return move
-    elseif diff_x < 0 and can_move(start_pos.x - 1, start_pos.y, map) then
-      move.dx = -1
-      return move
-    end
-  else -- y moves
-    if diff_y > 0 and can_move(start_pos.x, start_pos.y + 1, map) then
-      move.dy = 1
-      return move
-    elseif diff_y < 0 and can_move(start_pos.y, start_pos.y - 1, map) then
-      move.dy = -1
-      return move
-    end
+  if diff_x > 0 and can_move(start_pos.x + 1, start_pos.y, map) then
+    move.dx = 1
+    return move
+  elseif diff_x < 0 and can_move(start_pos.x - 1, start_pos.y, map) then
+    move.dx = -1
+    return move
   end
+  if diff_y > 0 and can_move(start_pos.x, start_pos.y + 1, map) then
+    move.dy = 1
+    return move
+  elseif diff_y < 0 and can_move(start_pos.x, start_pos.y - 1, map) then
+    move.dy = -1
+    return move
+  end
+
   -- return 0, 0 move
   return move
 end
