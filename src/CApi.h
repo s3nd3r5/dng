@@ -236,9 +236,9 @@ static int c_open_door(lua_State *L) {
           can_open = true;
           // erase key
           lvl->heldKeys.erase(lvl->heldKeys.begin() + k);
-          lvl->doorPositions.erase(lvl->doorPositions.begin() + i);
           lvl->map[lvl->doorPositions[i].y][lvl->doorPositions[i].x] =
               BLANK_SPACE;
+          lvl->doorPositions.erase(lvl->doorPositions.begin() + i);
           break;
         }
       }
