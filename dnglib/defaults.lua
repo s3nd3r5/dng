@@ -105,7 +105,7 @@ function onUpdate(dt)
     map = c_get_map();
     assert(type(map) == "table", "map is not a table")
 
-    for _, v in ipairs(enemies) do
+    for i, v in ipairs(enemies) do
         local next;
         if diff_time >= MOV_TIME then
             next = algs.pathfind(v, player, enemies, treasures, map)
@@ -118,6 +118,7 @@ function onUpdate(dt)
         if new_pos.x == player.x and new_pos.y == player.y then
             c_trigger_loss()
         end
+        enemies[i] = new_pos -- update new position for pathfinding
     end
     treasures = c_get_treasures()
     assert(type(treasures) == "table", "treasures is not a table")
