@@ -63,6 +63,14 @@ inline sf::RectangleShape create_square(sf::Color color, int x, int y) {
   return rect;
 }
 
+inline sf::RectangleShape create_small_square(sf::Color color, int x, int y) {
+  sf::RectangleShape rect({SPRITE_SIZE - 4.f, SPRITE_SIZE - 4.f});
+  rect.setFillColor(color);
+  auto pos = to_position_xy(x, y);
+  rect.setPosition({pos.x + 2.f, pos.y + 2.f});
+  return rect;
+}
+
 inline sf::RectangleShape create_wall(int x, int y) {
   return create_square(WALL_COLOR, x, y);
 }
@@ -77,6 +85,34 @@ inline sf::RectangleShape create_player(int x, int y) {
 
 inline sf::RectangleShape create_treasure(int x, int y) {
   return create_square(sf::Color::Yellow, x, y);
+}
+
+inline sf::RectangleShape create_key(char t, int x, int y) {
+  switch (t) {
+  case '1':
+    return create_small_square(sf::Color::Blue, x, y);
+  case '2':
+    return create_small_square(sf::Color::Green, x, y);
+  case '3':
+    return create_small_square(sf::Color::Black, x, y);
+  case '4':
+  default:
+    return create_small_square(sf::Color::White, x, y);
+  }
+}
+
+inline sf::RectangleShape create_door(char t, int x, int y) {
+  switch (t) {
+  case 'a':
+    return create_square(sf::Color::Blue, x, y);
+  case 'b':
+    return create_square(sf::Color::Green, x, y);
+  case 'c':
+    return create_square(sf::Color::Black, x, y);
+  case 'd':
+  default:
+    return create_square(sf::Color::White, x, y);
+  }
 }
 
 inline sf::Vector2f round(const sf::Vector2f vector) {

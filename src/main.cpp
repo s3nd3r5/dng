@@ -238,8 +238,13 @@ int main(int argc, char **argv) {
         window.draw(enemy.sprite);
       }
       for (auto &treasure : lvl->treasurePositions) {
-        treasure.sprite.setPosition(to_position(treasure));
         window.draw(treasure.sprite);
+      }
+      for (auto &key : lvl->keyPositions) {
+        window.draw(key.sprite);
+      }
+      for (auto &door : lvl->doorPositions) {
+        window.draw(door.sprite);
       }
     }
 

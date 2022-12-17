@@ -36,6 +36,23 @@ The map format is just a text file with the following key tokens:
 | t     | Treasure (0 or more)     |
 | 0     | Empty space              |
 
+Doors and Keys: 
+
+Doors and keys are single use and map to specific doors.
+Each key (1-4) maps to a door type (a-d)
+
+| Token | Description              |
+|:------|:-------------------------|
+| 1     | Key 1, for Door a        |
+| 2     | Key 2, for Door b        |
+| 3     | Key 3, for Door c        |
+| 4     | Key 4, for Door d        |
+| a     | Door a, opened by key 1  |
+| a     | Door b, opened by key 2  |
+| a     | Door c, opened by key 3  |
+| d     | Door d, opened by key 4  |
+
+
 #### Tips
 
 Space your map out using whitespace between every token (`w w w w` instead of `wwww`) for better readability.

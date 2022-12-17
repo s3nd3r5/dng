@@ -77,7 +77,7 @@ KEY_UP = 73
 KEY_DOWN = 74
 
 -- map values
-MAP_WALL = 1
+MAP_WALL = 9
 MAP_SPACE = 0
 MAP_VISITED = -1
 

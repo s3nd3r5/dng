@@ -63,17 +63,28 @@ void Level::load() {
         } else if (c == ENEMY_TKN) {
           auto e = create_enemy(x, y);
           this->enemyPositions.push_back(
-              {.id = this->nextId(), .x = x, .y = y, .sprite = e});
+              {.token = c, .id = this->nextId(), .x = x, .y = y, .sprite = e});
           this->map[y].push_back(BLANK_SPACE);
         } else if (c == PLAYER_TKN) {
           auto p = create_player(x, y);
-          this->player = {.id = playerId, .x = x, .y = y, .sprite = p};
+          this->player = {
+              .token = c, .id = playerId, .x = x, .y = y, .sprite = p};
           this->map[y].push_back(BLANK_SPACE);
         } else if (c == TREASURE_TKN) {
           auto t = create_treasure(x, y);
           this->treasurePositions.push_back(
-              {.id = this->nextId(), .x = x, .y = y, .sprite = t});
+              {.token = c, .id = this->nextId(), .x = x, .y = y, .sprite = t});
           this->map[y].push_back(BLANK_SPACE);
+        } else if (c >= KEY_TKN_START && c <= KEY_TKN_END) {
+          auto k = create_key(c, x, y);
+          this->keyPositions.push_back(
+              {.token = c, .id = this->nextId(), .x = x, .y = y, .sprite = k});
+          this->map[y].push_back(BLANK_SPACE);
+        } else if (c >= DOOR_TKN_START && c <= DOOR_TKN_END) {
+          auto d = create_door(c, x, y);
+          this->doorPositions.push_back(
+              {.token = c, .id = this->nextId(), .x = x, .y = y, .sprite = d});
+          this->map[y].push_back(WALL_SPACE);
         } else {
           continue;
         }
@@ -99,11 +110,45 @@ void Level::reset() {
   this->treasurePositions.clear();
   this->displayMap.clear();
   this->enemyPositions.clear();
+  this->keyPositions.clear();
+  this->doorPositions.clear();
   this->load();
 }
 
 bool Level::playerCanStep(int dx, int dy) const {
-  return canStep(player, dx, dy, map);
+  bool check_wall = canStep(player, dx, dy, map);
+
+  auto new_pos_x = player.x + dx;
+  auto new_pos_y = player.y + dy;
+  return check_wall ||
+         (isDoor(new_pos_x, new_pos_y) && tryDoor(new_pos_x, new_pos_y));
+}
+
+bool Level::isDoor(int x, int y) const {
+  for (auto &d : doorPositions) {
+    if (d.x == x && d.y == y) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool Level::tryDoor(int x, int y) const {
+
+  for (auto &d : doorPositions) {
+    if (d.x == x && d.y == y) {
+      char door_token = d.token;
+      for (auto &k : heldKeys) {
+        if (KEY_DOOR_MAPPING[k - KEY_TKN_START] == door_token) {
+          return true;
+        }
+      }
+      // matched door pos but not openable
+      return false;
+    }
+  }
+  // not a door?
+  return false;
 }
 
 int Level::nextId() { return idCounter++; }

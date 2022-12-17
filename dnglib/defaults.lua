@@ -60,6 +60,12 @@ keys = {
 --- setup random
 --math.randomseed(os.time())
 
+-- Checks if x,y equals for both objects
+local function is_collision(a, b)
+  return a.x == b.x and a.y == b.y
+end
+
+
 ---@param pressedKey number
 function onKeyPress(pressedKey)
     scene = c_get_scene()
@@ -102,35 +108,52 @@ function onUpdate(dt)
     treasures = c_get_treasures()
     assert(type(treasures) == "table", "treasures is not a table")
 
+    door_keys = c_get_keys()
+    assert(type(door_keys) == "table", "keys is not a table")
+
+    doors = c_get_doors()
+    assert(type(doors) == "table", "doors is not a table")
+
     map = c_get_map();
     assert(type(map) == "table", "map is not a table")
 
     for i, v in ipairs(enemies) do
         local next;
         if diff_time >= MOV_TIME then
-            next = algs.pathfind(v, player, enemies, treasures, map)
+            next = algs.pathfind(v, player, enemies, treasures, door_keys, doors, map)
         else
             next = { dx = 0, dy = 0 }
         end
 
         new_pos = c_move_enemy(v.id, next.dx, next.dy)
         assert(type(new_pos) == "table", "new_pos is not a table")
-        if new_pos.x == player.x and new_pos.y == player.y then
+        if is_collision(new_pos, player)  then
             c_trigger_loss()
         end
         enemies[i] = new_pos -- update new position for pathfinding
     end
-    treasures = c_get_treasures()
-    assert(type(treasures) == "table", "treasures is not a table")
 
     for _, t in ipairs(treasures) do
-        if t.x == player.x and t.y == player.y then
+        if is_collision(t, player) then
             c_score_treasure(t.id)
             if #treasures == 1 then
                 c_trigger_win()
             end
         end
     end
+
+    for _, k in ipairs(door_keys) do
+      if is_collision(k, player) then
+        c_take_key(k.id)
+      end
+    end
+
+    for _, d in ipairs(doors) do
+      if is_collision(d, player) then
+        c_open_door(d.id)
+      end
+    end
+
     if diff_time > MOV_TIME then
         diff_time = 0
     end

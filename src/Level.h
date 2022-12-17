@@ -39,8 +39,14 @@ static const char TREASURE_TKN = 't';
 static const char ENEMY_TKN = 'e';
 static const char BLANK_SPACE = '\0';
 static const char WALL_SPACE = '#';
+static const char KEY_TKN_START = '1';  // inclusive (1, 2, 3, 4)
+static const char KEY_TKN_END = '4';    // inclusive (1, 2, 3, 4)
+static const char DOOR_TKN_START = 'a'; // inclusive (a, b, c, d)
+static const char DOOR_TKN_END = 'd';   // inclusive (a, b, c, d)
+static const char KEY_DOOR_MAPPING[4] = {'a', 'b', 'c', 'd'};
 
 struct Pos {
+  char token;
   int id;
   int x;
   int y;
@@ -54,6 +60,8 @@ public:
   ~Level() = default;
   void load();
   bool playerCanStep(int dx, int dy) const;
+  bool tryDoor(int x, int y) const;
+  bool isDoor(int x, int y) const;
   int getEnemyIndex(int id);
   bool enemyCanStep(const Pos &pos, int dx, int dy) const;
   void reset();
@@ -64,8 +72,11 @@ public:
   std::vector<std::vector<char>> map; // source copy of map
   std::vector<sf::RectangleShape> displayMap;
   Pos player;
+  std::vector<char> heldKeys;
   std::vector<Pos> enemyPositions;
   std::vector<Pos> treasurePositions;
+  std::vector<Pos> doorPositions;
+  std::vector<Pos> keyPositions;
 
 private:
   int idCounter = 1; // defaults at 1 (player always 0)

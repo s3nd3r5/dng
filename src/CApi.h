@@ -35,6 +35,25 @@
 extern std::shared_ptr<Level> lvl;
 extern Scene scene;
 
+void push_position_table(lua_State *L, std::vector<Pos> positions) {
+  lua_createtable(L, int(positions.size()), 0);
+  int idx = 0;
+
+  for (auto &pos : positions) {
+    lua_pushnumber(L, ++idx);
+    lua_createtable(L, 0, 3);
+    lua_pushnumber(L, pos.token);
+    lua_setfield(L, -2, "token");
+    lua_pushnumber(L, pos.id);
+    lua_setfield(L, -2, "id");
+    lua_pushnumber(L, pos.x + 1);
+    lua_setfield(L, -2, "x");
+    lua_pushnumber(L, pos.y + 1);
+    lua_setfield(L, -2, "y");
+    lua_settable(L, -3);
+  }
+}
+
 /*
  * c_get_player_position(int x, int y)
  */
@@ -103,22 +122,7 @@ static int c_move_enemy(lua_State *L) {
  * c_get_enemies()
  */
 static int c_get_enemies(lua_State *L) {
-  lua_createtable(L, int(lvl->enemyPositions.size()), 0);
-
-  int idx = 0;
-
-  for (auto &pos : lvl->enemyPositions) {
-    lua_pushnumber(L, ++idx);
-    lua_createtable(L, 0, 3);
-    lua_pushnumber(L, pos.id);
-    lua_setfield(L, -2, "id");
-    lua_pushnumber(L, pos.x + 1);
-    lua_setfield(L, -2, "x");
-    lua_pushnumber(L, pos.y + 1);
-    lua_setfield(L, -2, "y");
-    lua_settable(L, -3);
-  }
-
+  push_position_table(L, lvl->enemyPositions);
   return 1;
 }
 
@@ -184,19 +188,7 @@ static int c_get_scene(lua_State *L) {
 }
 
 static int c_get_treasures(lua_State *L) {
-  lua_createtable(L, static_cast<int>(lvl->treasurePositions.size()), 0);
-  int idx = 0;
-  for (auto &t : lvl->treasurePositions) {
-    lua_pushnumber(L, ++idx);
-    lua_createtable(L, 0, 3);
-    lua_pushnumber(L, t.y + 1);
-    lua_setfield(L, -2, "y");
-    lua_pushnumber(L, t.x + 1);
-    lua_setfield(L, -2, "x");
-    lua_pushnumber(L, t.id);
-    lua_setfield(L, -2, "id");
-    lua_settable(L, -3);
-  }
+  push_position_table(L, lvl->treasurePositions);
   return 1;
 }
 
@@ -223,6 +215,56 @@ static int c_trigger_restart(lua_State *L) {
   return 1;
 }
 
+static int c_get_doors(lua_State *L) {
+  push_position_table(L, lvl->doorPositions);
+  return 1;
+}
+
+/**
+ * c_open_door(id)
+ * if you have a key it will open the door and use the key
+ */
+static int c_open_door(lua_State *L) {
+  int id = static_cast<int>(lua_tonumber(L, -1));
+  bool can_open = false;
+  for (int i = 0; i < lvl->doorPositions.size(); i++) {
+    if (lvl->doorPositions[i].id == id) {
+      char c = lvl->doorPositions[i].token;
+      for (int k = lvl->heldKeys.size() - 1; k >= 0; k--) {
+        char mapped_door = KEY_DOOR_MAPPING[lvl->heldKeys[k] - KEY_TKN_START];
+        if (mapped_door == c) {
+          can_open = true;
+          // erase key
+          lvl->heldKeys.erase(lvl->heldKeys.begin() + k);
+          lvl->doorPositions.erase(lvl->doorPositions.begin() + i);
+          lvl->map[lvl->doorPositions[i].y][lvl->doorPositions[i].x] =
+              BLANK_SPACE;
+          break;
+        }
+      }
+    }
+  }
+
+  return 1;
+}
+
+static int c_get_keys(lua_State *L) {
+  push_position_table(L, lvl->keyPositions);
+  return 1;
+}
+
+static int c_take_key(lua_State *L) {
+  int id = static_cast<int>(lua_tonumber(L, -1));
+  for (int i = 0; i < lvl->keyPositions.size(); i++) {
+    if (lvl->keyPositions[i].id == id) {
+      lvl->heldKeys.push_back(lvl->keyPositions[i].token);
+      lvl->keyPositions.erase(lvl->keyPositions.begin() + i);
+      break;
+    }
+  }
+  return 1;
+}
+
 // not for lua use
 void init_c_api(lua_State *L) {
   lua_register(L, "c_move_player", c_move_player);
@@ -239,6 +281,10 @@ void init_c_api(lua_State *L) {
   lua_register(L, "c_score_treasure", c_score_treasure);
   lua_register(L, "c_get_treasures", c_get_treasures);
   lua_register(L, "c_trigger_restart", c_trigger_restart);
+  lua_register(L, "c_get_doors", c_get_doors);
+  lua_register(L, "c_open_door", c_open_door);
+  lua_register(L, "c_get_keys", c_get_keys);
+  lua_register(L, "c_take_key", c_take_key);
 }
 
 #endif // DNG_CAPI_H
