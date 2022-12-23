@@ -37,6 +37,10 @@
 const float SPRITE_SIZE = 16.f; // squares
 const sf::Color WALL_COLOR = sf::Color(150, 150, 150, 255);
 const sf::Color BLANK_COLOR = sf::Color(216, 216, 216, 255);
+const sf::Color A_DOOR_COLOR = sf::Color(255, 0, 0, 255);
+const sf::Color B_DOOR_COLOR = sf::Color(0, 255, 0, 255);
+const sf::Color C_DOOR_COLOR = sf::Color(0, 0, 255, 255);
+const sf::Color D_DOOR_COLOR = sf::Color(229, 163, 78, 255);
 
 inline sf::Keyboard::Key get_key(sf::Event event) {
   if (event.type == sf::Event::KeyPressed ||
@@ -90,28 +94,28 @@ inline sf::RectangleShape create_treasure(int x, int y) {
 inline sf::RectangleShape create_key(char t, int x, int y) {
   switch (t) {
   case '1':
-    return create_small_square(sf::Color::Blue, x, y);
+    return create_small_square(A_DOOR_COLOR, x, y);
   case '2':
-    return create_small_square(sf::Color::Green, x, y);
+    return create_small_square(B_DOOR_COLOR, x, y);
   case '3':
-    return create_small_square(sf::Color::Black, x, y);
+    return create_small_square(C_DOOR_COLOR, x, y);
   case '4':
   default:
-    return create_small_square(sf::Color::White, x, y);
+    return create_small_square(D_DOOR_COLOR, x, y);
   }
 }
 
 inline sf::RectangleShape create_door(char t, int x, int y) {
   switch (t) {
   case 'a':
-    return create_square(sf::Color::Blue, x, y);
+    return create_square(A_DOOR_COLOR, x, y);
   case 'b':
-    return create_square(sf::Color::Green, x, y);
+    return create_square(B_DOOR_COLOR, x, y);
   case 'c':
-    return create_square(sf::Color::Black, x, y);
+    return create_square(C_DOOR_COLOR, x, y);
   case 'd':
   default:
-    return create_square(sf::Color::White, x, y);
+    return create_square(D_DOOR_COLOR, x, y);
   }
 }
 
