@@ -114,13 +114,16 @@ function onUpdate(dt)
     doors = c_get_doors()
     assert(type(doors) == "table", "doors is not a table")
 
+    dirts = c_get_dirts()
+    assert(type(dirts) == "table", "dirts is not a table")
+
     map = c_get_map();
     assert(type(map) == "table", "map is not a table")
 
     for i, v in ipairs(enemies) do
         local next;
         if diff_time >= MOV_TIME then
-            next = algs.pathfind(v, player, enemies, treasures, door_keys, doors, map)
+            next = algs.pathfind(v, player, enemies, treasures, door_keys, doors, dirts, map)
         else
             next = { dx = 0, dy = 0 }
         end
@@ -151,6 +154,12 @@ function onUpdate(dt)
     for _, d in ipairs(doors) do
       if is_collision(d, player) then
         c_open_door(d.id)
+      end
+    end
+
+    for _, r in ipairs(dirts) do
+      if is_collision(r, player) then
+        c_convert_dirt(r.id)
       end
     end
 

@@ -85,6 +85,11 @@ void Level::load() {
           this->doorPositions.push_back(
               {.token = c, .id = this->nextId(), .x = x, .y = y, .sprite = d});
           this->map[y].push_back(WALL_SPACE);
+        } else if (c == DIRT_TKN) {
+          auto d = create_dirt(x, y);
+          this->dirtPositions.push_back(
+              {.token = c, .id = this->nextId(), .x = x, .y = y, .sprite = d});
+          this->map[y].push_back(WALL_SPACE);
         } else {
           continue;
         }
@@ -112,6 +117,7 @@ void Level::reset() {
   this->enemyPositions.clear();
   this->keyPositions.clear();
   this->doorPositions.clear();
+  this->dirtPositions.clear();
   this->load();
 }
 
@@ -121,7 +127,8 @@ bool Level::playerCanStep(int dx, int dy) const {
   auto new_pos_x = player.x + dx;
   auto new_pos_y = player.y + dy;
   return check_wall ||
-         (isDoor(new_pos_x, new_pos_y) && tryDoor(new_pos_x, new_pos_y));
+         (isDoor(new_pos_x, new_pos_y) && tryDoor(new_pos_x, new_pos_y)) ||
+         (isDirt(new_pos_x, new_pos_y));
 }
 
 bool Level::isDoor(int x, int y) const {
@@ -148,6 +155,17 @@ bool Level::tryDoor(int x, int y) const {
     }
   }
   // not a door?
+  return false;
+}
+
+bool Level::isDirt(int x, int y) const {
+
+  for (auto &d : dirtPositions) {
+    if (d.x == x && d.y == y) {
+      return true;
+    }
+  }
+
   return false;
 }
 

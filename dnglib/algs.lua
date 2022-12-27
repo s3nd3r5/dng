@@ -152,10 +152,11 @@ end
 -- @param treasures list of treasure positions (cannot pass thru treasure)
 -- @param door_keys list of key positions (cannot pass thru treasure)
 -- @param doors list of door positions (cannot pass thru treasure)
+-- @param dirts list of dirt positions (player can pass, not enemy)
 ---@param map table 2D map array
 ---@return table best move to target [x, y]
 ---
-local function pathfind(start_pos, target_pos, enemies, treasures, door_keys, doors, map)
+local function pathfind(start_pos, target_pos, enemies, treasures, door_keys, doors, dirts, map)
     local queue = Queue:new()
     
     local visit_map = {}
@@ -180,6 +181,9 @@ local function pathfind(start_pos, target_pos, enemies, treasures, door_keys, do
     end
     for _, d in ipairs(doors) do
       visit_map[d.y][d.x] = MAP_WALL -- use wall value for impass
+    end
+    for _, r in ipairs(dirts) do
+      visit_map[r.y][r.x] = MAP_WALL -- use wall value for impass
     end
 
     -- since we mutate the visit_map let's calc this early if need be

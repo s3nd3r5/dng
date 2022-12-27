@@ -246,6 +246,9 @@ int main(int argc, char **argv) {
       for (auto &door : lvl->doorPositions) {
         window.draw(door.sprite);
       }
+      for (auto &dirt : lvl->dirtPositions) {
+        window.draw(dirt.sprite);
+      }
     }
 
     if (scene != Scene::LOSS) {

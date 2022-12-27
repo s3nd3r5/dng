@@ -44,6 +44,7 @@ static const char KEY_TKN_END = '4';    // inclusive (1, 2, 3, 4)
 static const char DOOR_TKN_START = 'a'; // inclusive (a, b, c, d)
 static const char DOOR_TKN_END = 'd';   // inclusive (a, b, c, d)
 static const char KEY_DOOR_MAPPING[4] = {'a', 'b', 'c', 'd'};
+static const char DIRT_TKN = '#';
 
 struct Pos {
   char token;
@@ -62,6 +63,7 @@ public:
   bool playerCanStep(int dx, int dy) const;
   bool tryDoor(int x, int y) const;
   bool isDoor(int x, int y) const;
+  bool isDirt(int x, int y) const;
   int getEnemyIndex(int id);
   bool enemyCanStep(const Pos &pos, int dx, int dy) const;
   void reset();
@@ -77,6 +79,7 @@ public:
   std::vector<Pos> treasurePositions;
   std::vector<Pos> doorPositions;
   std::vector<Pos> keyPositions;
+  std::vector<Pos> dirtPositions;
 
 private:
   int idCounter = 1; // defaults at 1 (player always 0)

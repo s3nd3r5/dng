@@ -265,6 +265,25 @@ static int c_take_key(lua_State *L) {
   return 1;
 }
 
+static int c_get_dirts(lua_State *L) {
+  push_position_table(L, lvl->dirtPositions);
+  return 1;
+}
+
+static int c_convert_dirt(lua_State *L) {
+  int id = static_cast<int>(lua_tonumber(L, -1));
+  for (int i = 0; i < lvl->dirtPositions.size(); i++) {
+    auto &d = lvl->dirtPositions[i];
+    if (d.id == id) {
+      lvl->map[d.y][d.x] = BLANK_SPACE;
+      lvl->dirtPositions.erase(lvl->dirtPositions.begin() + i);
+      return 1;
+    }
+  }
+
+  return 1;
+}
+
 // not for lua use
 void init_c_api(lua_State *L) {
   lua_register(L, "c_move_player", c_move_player);
@@ -285,6 +304,8 @@ void init_c_api(lua_State *L) {
   lua_register(L, "c_open_door", c_open_door);
   lua_register(L, "c_get_keys", c_get_keys);
   lua_register(L, "c_take_key", c_take_key);
+  lua_register(L, "c_get_dirts", c_get_dirts);
+  lua_register(L, "c_convert_dirt", c_convert_dirt);
 }
 
 #endif // DNG_CAPI_H
